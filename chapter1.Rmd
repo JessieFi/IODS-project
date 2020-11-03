@@ -9,5 +9,6 @@
 date()
 
 ```
-The text continues here.
+The text continues here. It is a very compricate course for me, since I don't have any background knowledge about computer science. It took me a lot of time to solve the problems during instoring the programmes.
+https://github.com/JessieFi/IODS-project
 
