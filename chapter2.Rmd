@@ -1,4 +1,4 @@
-# Insert chapter 2 title here
+# Analysis exercise
 
 *Describe the work you have done this week and summarize your learning.*
 
@@ -9,5 +9,106 @@
 ```{r}
 date()
 ```
+#data from: http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/learning2014.txt
+setwd(data.txt)
+getwd(data.txt)
+data<- read.table('data.txt',sep=',',header = T)
+#Reading the data, separating the data with a comma.
+#Display the five-number summary of each variable, from top to bottom in the data frame, the minimum value, 25% quantile, median, 75% quantile, and maximum value of each variable:
+x1<- fivenum(data$age)
+x2<-fivenum(data$attitude)
+x3<-fivenum(data$deep)
+x4<-fivenum(data$stra)
+x5<-fivenum(data$surf)
+x6<-fivenum(data$points)
+five.df<- data.frame(x1,x2,x3,x4,x5,x6)
+#Summarizing the five numbers of each variable into a data frame
+par(mfrow=c(2,3)) 
+#Spliting the drawing panel
+#Drawing the density curve of each variable and observe its distribution
+hist(data$age,freq = F);lines(density(data$age),col='blue'
+#Comparing with the normal distribution, the 'age' variable is a right skewed distribution.
+hist(data$attitude,freq=F);lines(density(data$attitude),col='orange')
+#'attitude' is left skewed distribution.
+hist(data$deep,freq = F);lines(density(data$deep),col='purple'
+#'deep' variable is left skewed
+hist(data$stra,freq = F);lines(density(data$stra),col='yellow')
+#'stra' variable roughly obeys the normal distribution
+hist(data$points,freq=F);lines(density(data$points))
+#'points' roughly obey a normal distribution
 
-Here we go again...
+
+#Comparing with the normal distribution, 'age' variable is right-skewed distribution; variable 'attitude' is left-skewed distribution; 'deep' variable is left-skewed distribution; 'stra' variable roughly obeys normal distribution; 'surf' roughly obeys normal distribution; 'points' roughly obeys normal distribution;
+
+#Making box plots of each variable for different genders
+data$gender<-as.factor(data$gender)
+#Converting gender variables into factor variables
+#Drawing box plots of each variable for different genders
+boxplot(data$age~data$gender,col='blue');boxplot(data$attitude~data$gender,col='orange')
+boxplot(data$deep~data$gender,col='purple');boxplot(data$stra~data$gender,col='yellow')
+boxplot(data$surf~data$gender,col='green');boxplot(data$points~data$gender)
+
+#According to the 'age' variable, the age of men is generally higher than women. From the variable of 'learning' attitude, men’s learning attitude is better than women’s. Both in terms of median and overall effect, men are higher; according to the variable 'deep', the distribution of males and females is similar. But males are more concentrated. For the 'stra 'variable, the median and maximum values of women are both higher than men; the Surf variable, the median of women is higher than men, and the distribution of this variable of women is more concentrated; After all, the median scores of men are slightly higher than women are. And all statistical indicators of men's scores, such as the upper and lower quantiles, are higher than women. Therefore, men still score higher than women, in the other words, men perform better than women.
+
+#First seting gender as a dummy variable, male is set to 0, female is set to 1
+data$gender<-ifelse(data$gender== "F", 1, 0)
+class(data$gender)
+#Checking whether the variable is converted to numeric
+#Fit a linear model with 'points' as the dependent variable. Three variables of 'gender', 'attitude' and 'deep' are randomly selected as predictors to fit the model.
+lm.sol<- lm(points~gender+attitude+deep,data = data)
+summary(lm.sol)
+#Viewing the fit results of the model
+
+#Result: the fitted equation is points=13.16+0.46*gender+3.67*attitude-0.62*deep
+
+#It can be seen from the fitting results that student scores are mainly related to learning attitude (attitude). This variable is significant. There is no significant relationship with 'deep' and 'gender', as it shows that the gender has no significant effect on academic performance. And for each unit of learning attitude, the student’s score increases by an average of 3.67 points. This result is quite realistic.
+
+#Explaination for the parameters of the model: 
+#The third column of the coefficient table is the t-test statistic of the explanatory variable, and the fourth column is the p-value to test whether the result is significant. From the p-value, it can also be seen that only the variable attitude is significant.
+#The penultimate line: the R square and the adjusted R square are 0.1953 and 0.1804, respectively. From these two values, the fitting effect of the model is not very good. Because the value of the R-square is too small. And it also shows that the proportion of the dependent variable explained by the three explanatory variables is not large, and it may be related to other factors.
+#The last line is the value of the F test statistic, which is used to test whether the regression equation is significant. From the F value and p value, it can be seen that the regression equation is significant.
+
+#Analysis residual
+yhat<- fitted(lm.sol) 
+#Generating the fitted value of the model
+res<-residuals(lm.sol)
+#Calculating the residuals of the model
+plot(yhat,res)
+#Plot the residuals of the model
+abline(h=0)
+#Adding horizontal line
+
+#It can be seen from the normal QQ graph that the residuals are basically concentrated on a straight line with a slight skew, but they basically obey the normality assumption.
+
+influence.measures(lm.sol)
+#Strong influence points of the output model
+
+
+#The output: points 4, 35, 56, 69, 100, and 105 are strong influence points, which are leverage points.
+
+#Removing the variable gender and deep from the model, and refit the regression equation
+lm.sol2<-lm(points~attitude,data = data)
+summary(lm.sol2)
+#Viewing the fit results of the model
+
+#The regression equation is points=11.63+3.53*attitude, which means every time the variable attitude increases by one unit, the student score points increase by an average of 3.53 points; at the same time, the variable attitude is very significant.
+#The third column in the coefficient table is the t-test statistic of the explanatory variable, which is used to test whether the regression variable is significant. 
+#The fourth column is the p value, which is used to judge whether the regression variable is significant, and p<0.05 is significant. 
+#The penultimate row is the R-square and the adjusted R-square, which are 0.1906 and 0.1856, respectively. 
+#It shows that only about 19% of the dependent variable is explained by the explanatory variable points: It also fully shows that the dependent variable points is also affected by other factors. The score is not only affected by the attitude of learning, but also by other factors. 
+#The interpretation ratio of the score by learning attitude is 19%.
+#The last line is the value of the F-test statistic and the p-value. The p-value is less than 0.05, indicating the regression equation is remarkable.
+
+#Analyzing the residuals of the model after excluding variables:
+yhat2<-fitted(lm.sol2)
+#Generating the fitted value of the model
+res2<-residuals(lm.sol2)
+#Generating the residuals of the model
+plot(yhat2,res2
+#Adding horizontal lines
+
+#The normal QQ graph shows that the residuals are basically concentrated on a straight line with a slight skew. But they basically obey the normality assumption.
+influence.measures(lm.sol2)
+#Outputing strong influenc point of model
+
+#The output results: points 4, 35, 56, 62, 69, 70, 82, 99, 100, and 101 are strong influence points, which are leverage points. In practical applications, these observation points should be eliminated before fitting the model.
